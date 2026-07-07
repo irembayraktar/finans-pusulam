@@ -690,13 +690,13 @@ function App() {
             />
           </label>
 
-          <label className="checkbox-row">
+          <label className="toggle-row">
             <input
               type="checkbox"
               checked={appState.profile.emailNotifications}
               onChange={(event) => updateEmailNotifications(event.target.checked)}
             />
-            <span>Aylık finans özeti e-postası al</span>
+            <span>Aylık özet maili</span>
           </label>
 
           <button type="button" className="sidebar-button" onClick={saveProfile}>
