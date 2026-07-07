@@ -254,6 +254,19 @@ textarea {
   color: #ffffff;
 }
 
+.checkbox-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.checkbox-row input {
+  accent-color: #d7f4e9;
+  min-height: auto;
+  width: 18px;
+  height: 18px;
+}
+
 .entry-panel {
   display: grid;
   gap: 14px;

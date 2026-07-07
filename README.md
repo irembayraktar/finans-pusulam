@@ -11,10 +11,10 @@ Uygulama iki modda çalışır:
 
 ## Canlı Demo
 
-Netlify deploy sonrasinda link buraya eklenecek:
+Canli demo:
 
 ```text
-https://finans-pusulam.netlify.app
+https://incomparable-seahorse-55ac17.netlify.app
 ```
 
 ## Ekran Görüntüsü

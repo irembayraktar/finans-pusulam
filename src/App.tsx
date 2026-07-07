@@ -19,7 +19,11 @@ type Profile = {
   name: string
   email: string
   avatar: string
+  notificationEmail: string
+  emailNotifications: boolean
 }
+
+type ProfileTextField = 'name' | 'email' | 'avatar' | 'notificationEmail'
 
 type AppState = {
   profile: Profile
@@ -89,9 +93,11 @@ const demoAccounts: Account[] = [
 
 const demoState: AppState = {
   profile: {
-    name: 'İrem Başaran',
+    name: 'İrem Bayraktar',
     email: 'irem@example.com',
     avatar: '',
+    notificationEmail: 'irem@example.com',
+    emailNotifications: true,
   },
   isBankConnected: false,
   transactions: [
@@ -143,6 +149,8 @@ const emptyCloudState: AppState = {
     name: '',
     email: '',
     avatar: '',
+    notificationEmail: '',
+    emailNotifications: true,
   },
   isBankConnected: false,
   transactions: [],
@@ -165,7 +173,20 @@ function loadState(): AppState {
 
   try {
     const raw = localStorage.getItem(storageKey)
-    return raw ? { ...demoState, ...JSON.parse(raw) } : demoState
+    if (!raw) {
+      return demoState
+    }
+
+    const parsed = JSON.parse(raw)
+
+    return {
+      ...demoState,
+      ...parsed,
+      profile: {
+        ...demoState.profile,
+        ...parsed.profile,
+      },
+    }
   } catch {
     return demoState
   }
@@ -253,7 +274,7 @@ function App() {
 
       const { data: profileData, error: profileError } = await client
         .from('profiles')
-        .select('full_name, avatar_url')
+        .select('full_name, avatar_url, notification_email, email_notifications')
         .eq('id', currentUser.id)
         .maybeSingle()
 
@@ -267,6 +288,8 @@ function App() {
           id: currentUser.id,
           full_name: fallbackName,
           avatar_url: null,
+          notification_email: currentUser.email || '',
+          email_notifications: true,
         })
       }
 
@@ -289,6 +312,8 @@ function App() {
             '',
           email: currentUser.email || '',
           avatar: profileData?.avatar_url || '',
+          notificationEmail: profileData?.notification_email || currentUser.email || '',
+          emailNotifications: profileData?.email_notifications ?? true,
         },
         transactions: (transactionsData || []).map(mapTransaction),
       }))
@@ -371,6 +396,8 @@ function App() {
           id: data.user.id,
           full_name: authForm.name,
           avatar_url: null,
+          notification_email: authForm.email,
+          email_notifications: true,
         })
         setNotice('Kayıt oluşturuldu. E-posta doğrulaması açıksa gelen kutunu kontrol et.')
       }
@@ -469,6 +496,8 @@ function App() {
         id: user.id,
         full_name: appState.profile.name,
         avatar_url: publicUrl,
+        notification_email: appState.profile.notificationEmail || appState.profile.email,
+        email_notifications: appState.profile.emailNotifications,
       })
 
       setAppState((current) => ({
@@ -510,12 +539,22 @@ function App() {
     }))
   }
 
-  function updateProfile(field: keyof Profile, value: string) {
+  function updateProfile(field: ProfileTextField, value: string) {
     setAppState((current) => ({
       ...current,
       profile: {
         ...current.profile,
         [field]: value,
+      },
+    }))
+  }
+
+  function updateEmailNotifications(value: boolean) {
+    setAppState((current) => ({
+      ...current,
+      profile: {
+        ...current.profile,
+        emailNotifications: value,
       },
     }))
   }
@@ -530,6 +569,8 @@ function App() {
       id: user.id,
       full_name: appState.profile.name,
       avatar_url: appState.profile.avatar || null,
+      notification_email: appState.profile.notificationEmail || appState.profile.email,
+      email_notifications: appState.profile.emailNotifications,
     })
 
     setNotice(error ? error.message : 'Profil kaydedildi.')
@@ -591,7 +632,7 @@ function App() {
               <input
                 value={authForm.name}
                 onChange={(event) => setAuthForm((current) => ({ ...current, name: event.target.value }))}
-                placeholder="İrem Başaran"
+                placeholder="İrem Bayraktar"
               />
             </label>
           )}
@@ -655,6 +696,25 @@ function App() {
               onChange={(event) => updateProfile('email', event.target.value)}
               disabled={Boolean(user)}
             />
+          </label>
+
+          <label>
+            Bildirim e-postası
+            <input
+              type="email"
+              value={appState.profile.notificationEmail}
+              onChange={(event) => updateProfile('notificationEmail', event.target.value)}
+              placeholder={appState.profile.email || 'irem@example.com'}
+            />
+          </label>
+
+          <label className="checkbox-row">
+            <input
+              type="checkbox"
+              checked={appState.profile.emailNotifications}
+              onChange={(event) => updateEmailNotifications(event.target.checked)}
+            />
+            <span>E-posta bildirimleri</span>
           </label>
 
           <button type="button" className="sidebar-button" onClick={saveProfile}>
