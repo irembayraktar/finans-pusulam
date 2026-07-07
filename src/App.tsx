@@ -19,11 +19,10 @@ type Profile = {
   name: string
   email: string
   avatar: string
-  notificationEmail: string
   emailNotifications: boolean
 }
 
-type ProfileTextField = 'name' | 'email' | 'avatar' | 'notificationEmail'
+type ProfileTextField = 'name' | 'email' | 'avatar'
 
 type AppState = {
   profile: Profile
@@ -96,7 +95,6 @@ const demoState: AppState = {
     name: 'İrem Bayraktar',
     email: 'irem@example.com',
     avatar: '',
-    notificationEmail: 'irem@example.com',
     emailNotifications: true,
   },
   isBankConnected: false,
@@ -149,7 +147,6 @@ const emptyCloudState: AppState = {
     name: '',
     email: '',
     avatar: '',
-    notificationEmail: '',
     emailNotifications: true,
   },
   isBankConnected: false,
@@ -274,7 +271,7 @@ function App() {
 
       const { data: profileData, error: profileError } = await client
         .from('profiles')
-        .select('full_name, avatar_url, notification_email, email_notifications')
+        .select('full_name, avatar_url, email_notifications')
         .eq('id', currentUser.id)
         .maybeSingle()
 
@@ -288,7 +285,6 @@ function App() {
           id: currentUser.id,
           full_name: fallbackName,
           avatar_url: null,
-          notification_email: currentUser.email || '',
           email_notifications: true,
         })
       }
@@ -312,7 +308,6 @@ function App() {
             '',
           email: currentUser.email || '',
           avatar: profileData?.avatar_url || '',
-          notificationEmail: profileData?.notification_email || currentUser.email || '',
           emailNotifications: profileData?.email_notifications ?? true,
         },
         transactions: (transactionsData || []).map(mapTransaction),
@@ -396,7 +391,6 @@ function App() {
           id: data.user.id,
           full_name: authForm.name,
           avatar_url: null,
-          notification_email: authForm.email,
           email_notifications: true,
         })
         setNotice('Kayıt oluşturuldu. E-posta doğrulaması açıksa gelen kutunu kontrol et.')
@@ -496,7 +490,6 @@ function App() {
         id: user.id,
         full_name: appState.profile.name,
         avatar_url: publicUrl,
-        notification_email: appState.profile.notificationEmail || appState.profile.email,
         email_notifications: appState.profile.emailNotifications,
       })
 
@@ -569,7 +562,6 @@ function App() {
       id: user.id,
       full_name: appState.profile.name,
       avatar_url: appState.profile.avatar || null,
-      notification_email: appState.profile.notificationEmail || appState.profile.email,
       email_notifications: appState.profile.emailNotifications,
     })
 
@@ -698,23 +690,13 @@ function App() {
             />
           </label>
 
-          <label>
-            Bildirim e-postası
-            <input
-              type="email"
-              value={appState.profile.notificationEmail}
-              onChange={(event) => updateProfile('notificationEmail', event.target.value)}
-              placeholder={appState.profile.email || 'irem@example.com'}
-            />
-          </label>
-
           <label className="checkbox-row">
             <input
               type="checkbox"
               checked={appState.profile.emailNotifications}
               onChange={(event) => updateEmailNotifications(event.target.checked)}
             />
-            <span>E-posta bildirimleri</span>
+            <span>Aylık finans özeti e-postası al</span>
           </label>
 
           <button type="button" className="sidebar-button" onClick={saveProfile}>
