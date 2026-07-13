@@ -17,13 +17,6 @@ Canli demo:
 https://incomparable-seahorse-55ac17.netlify.app
 ```
 
-## Ekran Görüntüsü
-
-GitHub'a yükledikten sonra buraya uygulama ekran görüntüsü eklenebilir:
-
-```md
-![Finans Pusulam dashboard](./docs/screenshots/dashboard.png)
-```
 
 ## Özellikler
 
